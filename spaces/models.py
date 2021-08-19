@@ -2,7 +2,7 @@ from django.db import models
 
 class Category(models.Model):
     name  = models.CharField(max_length=45)
-    image = models.ImageField(upload_to="images")
+    image = models.ImageField(upload_to="images", null=True)
 
     class Meta:
         db_table = "categories"
@@ -18,7 +18,7 @@ class District(models.Model):
 class Facility(models.Model):
     name  = models.CharField(max_length=45)
     space = models.ManyToManyField("Space", related_name="facility")
-    image = models.ImageField(upload_to="images")
+    image = models.ImageField(upload_to="images", null=True)
 
     class Meta:
         db_table = "facilities"
