@@ -18,7 +18,6 @@ class Migration(migrations.Migration):
                 ('kakao_id', models.CharField(max_length=45, unique=True)),
                 ('email', models.CharField(max_length=200, unique=True)),
                 ('nickname', models.CharField(max_length=200)),
-                ('phone_number', models.CharField(max_length=200)),
                 ('point', models.DecimalField(decimal_places=2, max_digits=10, null=True)),
             ],
             options={
