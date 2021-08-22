@@ -52,7 +52,7 @@ class ProductsView(View):
                     "district"  : space.district.name,
                     "price"     : space.day_price,
                     "max_count" : space.max_count,
-                    "image"     : [image.image.url for image in space.image_set.all()],
+                    "image"     : [image.image for image in space.image_set.all()],
                     "like"      : space.like
                 } for space in spaces]
             
