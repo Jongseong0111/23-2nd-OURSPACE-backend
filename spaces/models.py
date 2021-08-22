@@ -2,7 +2,7 @@ from django.db import models
 
 class Category(models.Model):
     name  = models.CharField(max_length=45)
-    image = models.ImageField(upload_to="images", null=True)
+    image = models.URLField(null=True)
 
     class Meta:
         db_table = "categories"
@@ -18,7 +18,7 @@ class District(models.Model):
 class Facility(models.Model):
     name  = models.CharField(max_length=45)
     space = models.ManyToManyField("Space", related_name="facility")
-    image = models.ImageField(upload_to="images", null=True)
+    image = models.URLField(null=True)
 
     class Meta:
         db_table = "facilities"
@@ -37,13 +37,9 @@ class Space(models.Model):
     user        = models.ForeignKey("users.User", on_delete=models.CASCADE)
     title       = models.CharField(max_length=200)
     sub_title   = models.CharField(max_length=200)
-    description = models.TextField()
     min_count   = models.IntegerField()
     max_count   = models.IntegerField()
-    mainimage   = models.ImageField(upload_to="images", null=True)
     like        = models.IntegerField()
-    lattitude   = models.DecimalField(max_digits=9, decimal_places=6)
-    longitude   = models.DecimalField(max_digits=9, decimal_places=6)
     address     = models.CharField(max_length=200)
 
     class Meta:
@@ -51,7 +47,7 @@ class Space(models.Model):
 
 class Image(models.Model):
     space = models.ForeignKey("Space", on_delete=models.CASCADE)
-    image = models.ImageField(upload_to="images")
+    image = models.URLField(null=True)
 
     class Meta:
         db_table = "images"
@@ -59,7 +55,7 @@ class Image(models.Model):
 class Review(models.Model):
     user      = models.ForeignKey("users.User", on_delete=models.CASCADE)
     space     = models.ForeignKey("Space", on_delete=models.CASCADE)
-    image     = models.ImageField(upload_to="images")
+    image     = models.URLField(null=True)
     create_at = models.DateTimeField(auto_now_add=True)
     grade     = models.DecimalField(max_digits=4, decimal_places=2)
     content   = models.TextField()

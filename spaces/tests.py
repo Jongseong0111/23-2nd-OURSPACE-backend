@@ -35,11 +35,8 @@ class MenuPageTest(TestCase):
                 sub_title   = f'SubTitle{i+1}',
                 min_count   = i+1,
                 max_count   = 40-i,
-                mainimage   = f'MainImage{i+1}',
                 like        = 16 - abs(8-i),
-                address     = f'Address{i+1}',
-                lattitude   = i+1,
-                longitude   = i+1
+                address     = f'Address{i+1}'
             ) for i in range(16)]
         )
 
@@ -106,7 +103,7 @@ class MenuPageTest(TestCase):
                         "district"  : "District1",
                         "price"     : "11000.00",
                         "max_count" : 40,
-                        "image"     : ["https://ourspace-js.s3.ap-northeast-2.amazonaws.com/static/Image1"],
+                        "image"     : ["Image1"],
                         "like"      : 8
                     }
                 ] 
@@ -128,7 +125,7 @@ class MenuPageTest(TestCase):
                         "district"  : "District4",
                         "price"     : "14000.00",
                         "max_count" : 33,
-                        "image"     : ["https://ourspace-js.s3.ap-northeast-2.amazonaws.com/static/Image8"],
+                        "image"     : ["Image8"],
                         "like"      : 15
                     },
                     {
@@ -139,7 +136,7 @@ class MenuPageTest(TestCase):
                         "district"  : "District3",
                         "price"     : "15000.00",
                         "max_count" : 34,
-                        "image"     : ["https://ourspace-js.s3.ap-northeast-2.amazonaws.com/static/Image7"],
+                        "image"     : ["Image7"],
                         "like"      : 14
                     }
                 ] 
@@ -161,7 +158,7 @@ class MenuPageTest(TestCase):
                         "district"  : "District3",
                         "price"     : "15000.00",
                         "max_count" : 34,
-                        "image"     : ["https://ourspace-js.s3.ap-northeast-2.amazonaws.com/static/Image7"],
+                        "image"     : ["Image7"],
                         "like"      : 14
                     },
                     {
@@ -172,7 +169,7 @@ class MenuPageTest(TestCase):
                         "district"  : "District4",
                         "price"     : "14000.00",
                         "max_count" : 33,
-                        "image"     : ["https://ourspace-js.s3.ap-northeast-2.amazonaws.com/static/Image8"],
+                        "image"     : ["Image8"],
                         "like"      : 15
                     }
                 ]
@@ -227,7 +224,3 @@ class DistrcitTest(TestCase):
             ]
         })
         self.assertEqual(response.status_code, 200)
-
-
-
-    
