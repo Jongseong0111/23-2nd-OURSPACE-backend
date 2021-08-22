@@ -9,8 +9,8 @@ class Category(models.Model):
 
 class District(models.Model):
     name      = models.CharField(max_length=45)
-    lattitude = models.DecimalField(max_digits=9, decimal_places=6)
-    longitude = models.DecimalField(max_digits=9, decimal_places=6)
+    lattitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
 
     class Meta:
         db_table = "districts"
