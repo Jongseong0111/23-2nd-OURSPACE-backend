@@ -34,7 +34,6 @@ INSTALLED_APPS = [
     'orders',
     'storages'
 ]
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

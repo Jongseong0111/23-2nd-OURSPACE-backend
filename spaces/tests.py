@@ -1,8 +1,10 @@
+import jwt
 from django.test   import TestCase, Client
 
 from users.models  import User
-from spaces.models import Category, District, Space, Option, Facility, Image
+from spaces.models import *
 from orders.models import Order, OrderStatus, Booker
+from my_settings    import SECRET_KEY
 
 class MenuPageTest(TestCase):
     def setUp(self):
@@ -268,3 +270,69 @@ class CategoryTest(TestCase):
             ]
         })
         self.assertEqual(response.status_code, 200)
+
+class HostPostTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        user = User.objects.create(
+            kakao_id = '140327275127424',
+            nickname = 'jang',
+            email = 'test@naver.com'
+        )
+        Category.objects.create(
+            name = 'test',
+            image = 'test.jpg'
+        )
+        District.objects.create(
+            name = 'test',
+            lattitude = 1,
+            longitude = 1
+        )
+        Facility.objects.create(
+            name = 'test',
+            image = 'test.jpg'
+        )
+        cls.token = jwt.encode({'id' :user.id}, SECRET_KEY, algorithm='HS256')
+    
+    @classmethod
+    def tearDownClass(cls):
+        User.objects.all().delete()
+        Category.objects.all().delete()
+        District.objects.all().delete()
+        Facility.objects.all().delete()
+        Space.objects.all().delete()
+
+    def test_hostpost_view_success(self):
+        client = Client()
+        data = {
+            'category'   : 1,
+            'district'   : 1,
+            'title      ': 'test',
+            'sub_title'  : 'test',
+            'min_count'  : 1,
+            'max_count'  : 2,
+            'address'    : 'test',
+            'lattitude'  : 1,
+            'longitude'  : 1,
+            'like'       : 0,
+            'image'      : ['https://ourspace.s3.ap-northeast-2.amazonaws.com/static/image/room1.jpg'],
+            'price_day'  : 1,
+            'price_night': 1,
+            'price_all'  : 1,
+            'facility'   : ['1']
+        }
+        header = {'HTTP_Authorization' : self.token}
+        response = client.post('/space/host', data ,ContentType='multipart/form-data', **header)
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.json(),{'message':'success'})
+
+    def test_hostpost_view_key_error(self):
+        client = Client()
+        data = {
+            'category'   : 1,
+            'district'   : 1,
+        }
+        header = {'HTTP_Authorization' : self.token}
+        response = client.post('/space/host', data, ContentType='multipart/form-data', **header)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(),{'message':'Key_Error'})

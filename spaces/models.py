@@ -40,6 +40,8 @@ class Space(models.Model):
     min_count   = models.IntegerField()
     max_count   = models.IntegerField()
     like        = models.IntegerField()
+    lattitude   = models.DecimalField(max_digits=9, decimal_places=6, null=True)
+    longitude   = models.DecimalField(max_digits=9, decimal_places=6, null=True)
     address     = models.CharField(max_length=200)
 
     class Meta:

@@ -45,6 +45,8 @@ class Migration(migrations.Migration):
                 ('min_count', models.IntegerField()),
                 ('max_count', models.IntegerField()),
                 ('like', models.IntegerField()),
+                ('lattitude', models.DecimalField(decimal_places=6, max_digits=9, null=True)),
+                ('longitude', models.DecimalField(decimal_places=6, max_digits=9, null=True)),
                 ('address', models.CharField(max_length=200)),
                 ('category', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='spaces.category')),
                 ('district', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='spaces.district')),

@@ -27,7 +27,7 @@ class KakaoSignInView(View):
                 user.save()
 
             token = jwt.encode({'id':user.id}, SECRET_KEY, algorithm= 'HS256')
-            return JsonResponse({'TOKEN':token}, status=200)
+            return JsonResponse({'access_token':token}, status=200)
         except KeyError:
             return JsonResponse({'message':'invalid_token'}, status=400)
         
