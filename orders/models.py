@@ -5,7 +5,7 @@ class Order(models.Model):
     user   = models.ForeignKey("users.User", on_delete=models.CASCADE)
     status = models.ForeignKey("OrderStatus", on_delete=models.CASCADE)
     option = models.ForeignKey("spaces.Option", on_delete=models.CASCADE)
-    booker = models.ForeignKey("Booker", on_delete=models.CASCADE)
+    booker = models.ForeignKey("Booker", on_delete=models.CASCADE, null=True)
     count  = models.IntegerField()
     date   = models.DateField()
 

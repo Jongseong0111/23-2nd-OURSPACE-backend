@@ -1,5 +1,7 @@
-from pathlib import Path
-from my_settings import DATABASES, SECRET_KEY
+import os
+
+from pathlib     import Path
+from my_settings import DATABASES, SECRET_KEY, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,6 +32,7 @@ INSTALLED_APPS = [
     'users',
     'spaces',
     'orders',
+    'storages'
 ]
 
 MIDDLEWARE = [
@@ -102,11 +105,34 @@ USE_L10N = True
 
 USE_TZ = False
 
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY_ID
+
+AWS_SECRET_ACCESS_KEY = AWS_SECRET_ACCESS_KEY
+
+AWS_STORAGE_BUCKET_NAME = 'ourspace-js'
+
+AWS_REGION = 'ap-northeast-2'
+
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.%s.amazonaws.com' % (AWS_STORAGE_BUCKET_NAME, AWS_REGION)
+
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+
+AWS_LOCATION = 'static'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
+
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

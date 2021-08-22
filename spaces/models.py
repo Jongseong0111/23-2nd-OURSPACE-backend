@@ -40,7 +40,7 @@ class Space(models.Model):
     description = models.TextField()
     min_count   = models.IntegerField()
     max_count   = models.IntegerField()
-    mainimage   = models.ImageField(upload_to="images")
+    mainimage   = models.ImageField(upload_to="images", null=True)
     like        = models.IntegerField()
     lattitude   = models.DecimalField(max_digits=9, decimal_places=6)
     longitude   = models.DecimalField(max_digits=9, decimal_places=6)
