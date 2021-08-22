@@ -5,11 +5,11 @@ from django.views     import View
 from django.db.models import Min, Q, Count
 from django.db        import transaction
 
-from spaces.models     import District, Space, Option, Image, Facility, Category
-from orders.models     import OrderStatus
-from users.models      import User
-from users.utils       import login_decorator 
-from my_settings       import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+from spaces.models    import Space, District, Category, Image, Option, Facility
+from orders.models    import Order, OrderStatus
+from users.models import User
+from users.utils import login_decorator
+from my_settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
 from ourspace.settings import AWS_STORAGE_BUCKET_NAME
 
 class ProductsView(View):
@@ -102,7 +102,8 @@ class HostView(View):
         's3',
         aws_access_key_id = AWS_ACCESS_KEY_ID,
         aws_secret_access_key = AWS_SECRET_ACCESS_KEY
-    )   
+        )
+
         try:
             with transaction.atomic():
                 space = Space.objects.create(
@@ -127,19 +128,18 @@ class HostView(View):
                 ])
                 [space.facility.add(Facility.objects.get(id=facility))for facility in facilities]
                 
-                for sign in signs:
+                for sign in signs: 
                     s3_client.upload_fileobj(
                         sign['image'],
                         AWS_STORAGE_BUCKET_NAME,
                         'static/image/'+sign['key'],
                         ExtraArgs = {
-                            'ContentType' : sign['image'].content_type
+                            'ContentType': sign['image'].content_type
                         }
                     )
                 return JsonResponse({'message':'success'}, status=200)
         except KeyError:
             return JsonResponse({'message':'Key_Error'}, status=400)
-
 
 class FacilityView(View):
     def get(self, request):
@@ -147,6 +147,63 @@ class FacilityView(View):
             'id' : facility.id,
             'name' : facility.name,
             'image' : facility.image
+        }for facility in Facility.objects.all()]
+        
+        return JsonResponse({'results':results}, status=200)
+
+class ProductDetailView(View):
+    def get(self, request, space_id):
+
+        if not Space.objects.filter(id=space_id).exists():
+            return JsonResponse({'message':'No_Space'}, status=404)
+
+        space = Space.objects.get(id=space_id)
+
+        results = [{
+            'id'         : space.id,
+            'category_id': space.category.id,
+            'district_id': space.district.id,
+            'image'      : [image.image for image in space.image_set.all()],
+            'title'      : space.title,
+            'sub_title'  : space.sub_title,
+            'min_count'  : space.min_count,
+            'max_count'  : space.max_count,
+            'address'    : space.address,
+            'like'       : space.like,
+            'price'      : [[option.id, option.option, option.price ]for option in space.option_set.all()],
+            'facility'   : [{
+                'id'   : facility.id,
+                'name' : facility.name,
+                'image': facility.image
+                }for facility in space.facility.all()]
+        }]
+
+        return JsonResponse({'results':results}, status=200)
+
+class DateFilterView(View):
+    def get(self, request, space_id):
+        date   = request.GET.get('date')
+        option = request.GET.get('option')
+
+        if not Order.objects.filter(space_id=space_id, date=date, status_id=OrderStatus.Status.COMPLETED.value).exists():
+            return JsonResponse({'message':'OK'}, status=200)
+
+        if option == 'all' :
+            return JsonResponse({'message':'DENIED'}, status=400)
+
+        orders = Order.objects.filter(space_id=space_id, date=date, status_id=OrderStatus.Status.COMPLETED.value)
+
+        if orders.filter(Q(option__option='all') | Q(option__option=option)).exists():
+            return JsonResponse({'message':'DENIED'}, status=400)
+
+        return JsonResponse({'message':'OK'}, status=200)
+
+class FacilityView(View):
+    def get(self, request):
+        results = [{
+            'id'   : facility.id,
+            'name' : facility.name,
+            'image': facility.image
         }for facility in Facility.objects.all()]
 
         return JsonResponse({'results':results}, status=200)
