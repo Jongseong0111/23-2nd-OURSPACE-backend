@@ -1,4 +1,5 @@
 from django.urls   import path
+
 from spaces.views  import ProductsView, DistrictView, HostView, CategoryView, ProductDetailView, DateFilterView, FacilityView, ReviewView
 
 urlpatterns = [

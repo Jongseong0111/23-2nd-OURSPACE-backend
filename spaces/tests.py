@@ -1,4 +1,5 @@
-import jwt, json
+import jwt
+from unittest.mock import patch, MagicMock
 
 from django.test                    import TestCase, Client
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -78,7 +79,6 @@ class ProductsTest(TestCase):
                 name = f'Facilitiy{i+1}'
             ) for i in range(4)]
         )
-
         for i in range(4):
             Facility.objects.get(id=i+1).space.add(Space.objects.get(id=i+1))
     def tearDown(self):
@@ -191,7 +191,7 @@ class DistrcitTest(TestCase):
                 longitude = i+1
             ) for i in range(4)]
         )
-
+    
     def tearDown(self):
         District.objects.all().delete()
 
@@ -274,157 +274,94 @@ class CategoryTest(TestCase):
         })
         self.assertEqual(response.status_code, 200)
 
-class HostPostTest(TestCase):
+
+class HostViewTest(TestCase):
     def setUp(self):
         User.objects.create(
-            id=1,
+            id = 1,
             kakao_id = '140327275127424',
             nickname = 'jang',
             email = 'test@naver.com'
         )
         Category.objects.create(
-            id=1,
+            id = 1,
             name = 'test',
             image = 'test.jpg'
         )
         District.objects.create(
-            id=1,
+            id =1,
             name = 'test',
             lattitude = 1,
             longitude = 1
         )
-        Facility.objects.create(
-            id=1,
-            name = 'test',
-            image = 'test.jpg'
-        )
+        Facility.objects.bulk_create([
+            Facility(id=1, name = 'test',image = 'test.jpg'),
+            Facility(id=2, name = 'test2', image= 'test2.jpg')
+        ])
         self.token = jwt.encode({'id' :User.objects.get(id=1).id}, SECRET_KEY, algorithm='HS256')
-    
+
     def tearDown(self):
         Facility.objects.all().delete()
         District.objects.all().delete()
         Category.objects.all().delete()
         User.objects.all().delete()
 
-    def test_hostpost_view_success(self):
+    @patch('spaces.views.boto3.client')
+    def test_hostpost_view_success(self, mocked_s3):
         client = Client()
+
         data = {
-            'category'   : 1,
-            'district'   : 1,
+            'category'   : '1',
+            'district'   : '1',
             'title      ': 'test',
             'sub_title'  : 'test',
-            'max_count'  : 4,
+            'max_count'  : '4',
             'address'    : '서울 강남구',
-            'image'      : ['room1.jpg'],
-            'price_day'  : 1,
-            'price_night': 1,
-            'price_all'  : 1,
-            'facility'   : ['1']
+            'image'      : SimpleUploadedFile(
+                'test1.jpg',
+                b'file_content',
+                content_type='image/ief'),
+            'price_day'  : '1',
+            'price_night': '1',
+            'price_all'  : '1',
+            'facility'   : '1,2'
         }
+
+        class MockedResponse:
+            def upload(self):
+                return None
+
+        mocked_s3.upload = MagicMock(return_value=MockedResponse())
         header = {'HTTP_Authorization' : self.token}
         response = client.post('/spaces/host', data ,ContentType='multipart/form-data', **header)
         self.assertEqual(response.status_code,200)
         self.assertEqual(response.json(),{'message':'success'})
 
-    def test_hostpost_view_key_error(self):
+    @patch('spaces.views.boto3.client')
+    def test_hostpost_view_key_error(self, mocked_s3):
         client = Client()
-        data = {}
+
+        data = {
+            'category'   : '1',
+            'district'   : '1',
+            'title_error': 'test',
+            'sub_title'  : 'test',
+            'max_count'  : '4',
+            'address'    : '서울 강남구',
+            'price_day'  : '1',
+            'price_night': '1',
+            'price_all'  : '1',
+            'facility'   : '1,2'
+        }
+        class MockedResponse:
+            def upload(self):
+                return None
+
+        mocked_s3.upload = MagicMock(return_value=MockedResponse())
         header = {'HTTP_Authorization' : self.token}
         response = client.post('/spaces/host', data, ContentType='multipart/form-data', **header)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(),{'message':'Key_Error'}) 
-
-# class DateFilterViewTest(TestCase):
-#     @classmethod
-#     def setUpClass(cls):
-#         user = User.objects.create(
-#             kakao_id = '140327275127424',
-#             nickname = 'jang',
-#             email = 'test@naver.com'
-#         )
-#         Booker.objects.create(
-#             name = 'test',
-#             phone_number = '01012345678',
-#             email = 'test@naver.com'
-#         )
-#         Category.objects.create(
-#             name = 'test',
-#             image = 'test.jpg'
-#         )
-#         District.objects.create(
-#             name = 'test',
-#             lattitude = 1,
-#             longitude = 1
-#         )
-#         Facility.objects.create(
-#             name = 'test',
-#             image = 'test.jpg'
-#         )
-#         space = Space.objects.create(
-#             user        = user,
-#             category_id = 1,
-#             district_id = 1,
-#             title       = 'test',
-#             sub_title   = 'test',
-#             min_count   = 1,
-#             max_count   = 1,
-#             address     = 'test',
-#             like        = 0
-#             )
-#         Option.objects.bulk_create([
-#             Option(space_id=1, option='day', price=1),
-#             Option(space_id=1, option='night', price=1),
-#             Option(space_id=1, option='all', price=1)
-#             ])
-#         OrderStatus.objects.bulk_create([
-#             OrderStatus(name = 'WAITING'),
-#             OrderStatus(name = 'COMPLETED')
-#         ])
-#         Order.objects.create(
-#             count = 4,
-#             date = '2021-08-22',
-#             booker_id = 1,
-#             option_id = 1,
-#             space_id =1,
-#             status_id = 2,
-#             user_id = 1
-#         )
-#     @classmethod
-#     def tearDownClass(cls):
-#         User.objects.all().delete()
-#         Category.objects.all().delete()
-#         District.objects.all().delete()
-#         Facility.objects.all().delete()
-#         Space.objects.all().delete()
-#         Option.objects.all().delete()
-
-#     def test_date_filter_view_ok(self):
-#         client = Client()
-
-#         response = client.get('/spaces/detail/1/status?date=2021-08-22&option=night')
-#         self.assertEqual(response.status_code, 200)
-#         self.assertEqual(response.json(), {'message':'OK'})
-
-#     def test_date_filter_view_ok_2(self):
-#         client = Client()
-
-#         response = client.get('/spaces/detail/1/status?date=2021-08-23&option=night')
-#         self.assertEqual(response.status_code, 200)
-#         self.assertEqual(response.json(), {'message':'OK'})
-
-#     def test_date_filter_view_denied(self):
-#         client = Client()
-
-#         response = client.get('/spaces/detail/1/status?date=2021-08-22&option=day')
-#         self.assertEqual(response.status_code, 400)
-#         self.assertEqual(response.json(), {'message':'DENIED'})
-
-#     def test_date_filter_view_denied_2(self):
-#         client = Client()
-
-#         response = client.get('/spaces/detail/1/status?date=2021-08-22&option=all')
-#         self.assertEqual(response.status_code, 400)
-#         self.assertEqual(response.json(), {'message':'DENIED'})
 
 class ReviewViewTest(TestCase):
     def setUp(self):
@@ -539,3 +476,204 @@ class ReviewViewTest(TestCase):
                 'MESSAGE':'KEY_ERROR'
             }
         )
+
+class ProductDetailViewTest(TestCase):
+    def setUp(self):
+        user = User.objects.create(
+            id=1,
+            kakao_id = '140327275127424',
+            nickname = 'jang',
+            email = 'test@naver.com'
+        )
+        Category.objects.create(
+            id=1,
+            name = 'test',
+            image = 'test.jpg'
+        )
+        District.objects.create(
+            id=1,
+            name = 'test',
+            lattitude = 1,
+            longitude = 1
+        )
+        Facility.objects.create(
+            id=1,
+            name = 'test',
+            image = 'test.jpg'
+        )
+        space = Space.objects.create(
+            id=1,
+            user        = user,
+            category_id = 1,
+            district_id = 1,
+            title       = 'test',
+            sub_title   = 'test',
+            min_count   = 2,
+            max_count   = 1,
+            address     = 'test',
+            like        = 0
+            )
+        Image.objects.create(space_id=1, image='room1.jpg')
+
+        Option.objects.bulk_create([
+            Option(id=1,space_id=1, option='day', price=1),
+            Option(id=2,space_id=1, option='night', price=1),
+            Option(id=3,space_id=1, option='all', price=1)
+        ])
+        space.facility.add(Facility.objects.get(id=1))
+
+    def tearDown(self):
+        Option.objects.all().delete()
+        Space.objects.all().delete()
+        Facility.objects.all().delete()
+        District.objects.all().delete()
+        Category.objects.all().delete()
+        User.objects.all().delete()
+
+    def test_product_detail_view_success(self):
+        client = Client()
+
+        response = client.get('/spaces/detail/1')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(),
+        {'results':[{
+            'id'         : 1,
+            'category_id': 1,
+            'district_id': 1,
+            'image'      : ['room1.jpg'],
+            'title'      : 'test',
+            'sub_title'  : 'test',
+            'min_count'  : 2,
+            'max_count'  : 1,
+            'address'    : 'test',
+            'like'       : 0,
+            'price'      : [[1,'day','1.00'],[2,'night','1.00'],[3,'all','1.00']],
+            'facility' : [{
+                'id'   : 1,
+                'name' : 'test',
+                'image': 'test.jpg'
+                }]  
+        }]})
+
+    def test_product_detail_view_no_space(self):
+        client = Client()
+
+        response = client.get('/spaces/detail/14')
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json(), {'message':'No_Space'})
+
+class DateFilterViewTest(TestCase):
+    def setUp(self):
+        user = User.objects.create(
+            id=1,
+            kakao_id = '140327275127424',
+            nickname = 'jang',
+            email = 'test@naver.com'
+        )
+        Booker.objects.create(
+            id=1,
+            name = 'test',
+            phone_number = '01012345678',
+            email = 'test@naver.com'
+        )
+        category = Category.objects.create(
+            id=1,
+            name = 'test',
+            image = 'test.jpg'
+        )
+        District.objects.create(
+            id=1,
+            name = 'test',
+            lattitude = 1,
+            longitude = 1
+        )
+        Facility.objects.create(
+            id=1,
+            name = 'test',
+            image = 'test.jpg'
+        )
+        Space.objects.create(
+            id=1,
+            user        = user,
+            category    = category,
+            district_id = 1,
+            title       = 'test',
+            sub_title   = 'test',
+            min_count   = 1,
+            max_count   = 1,
+            address     = 'test',
+            like        = 0
+            )
+        Option.objects.bulk_create([
+            Option(id=1,space_id=1, option='day', price=1),
+            Option(id=2,space_id=1, option='night', price=1),
+            Option(id=3,space_id=1, option='all', price=1)
+            ])
+        OrderStatus.objects.bulk_create([
+            OrderStatus(id=1,name = 'WAITING'),
+            OrderStatus(id=2,name = 'COMPLETED')
+        ])
+        Order.objects.create(
+            id=1,
+            count = 4,
+            date = '2021-08-22',
+            booker_id = 1,
+            option_id = 1,
+            space_id =1,
+            status_id = 2,
+            user_id = 1
+        )
+    def tearDown(self):
+        Option.objects.all().delete()
+        Space.objects.all().delete()
+        Facility.objects.all().delete()
+        District.objects.all().delete()
+        Category.objects.all().delete()
+        User.objects.all().delete()
+
+    def test_date_filter_view_ok(self):
+        client = Client()
+
+        response = client.get('/spaces/detail/1/status?date=2021-08-22&option=night')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'message':'OK'})
+
+    def test_date_filter_view_ok_2(self):
+        client = Client()
+
+        response = client.get('/spaces/detail/1/status?date=2021-08-23&option=night')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'message':'OK'})
+
+    def test_date_filter_view_denied(self):
+        client = Client()
+
+        response = client.get('/spaces/detail/1/status?date=2021-08-22&option=day')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'message':'DENIED'})
+
+    def test_date_filter_view_denied_2(self):
+        client = Client()
+
+        response = client.get('/spaces/detail/1/status?date=2021-08-22&option=all')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'message':'DENIED'})
+
+class FacilityViewTest(TestCase):
+    def setUp(self):
+        Facility.objects.create(id=1, name='test', image='test.jpg')
+
+    def tearDown(self):
+        Facility.objects.all().delete()
+
+    def test_faciliity_view_ok(self):
+        client = Client()
+
+        response = client.get('/spaces/facility')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'results':
+        [{
+            'id' : 1,
+            'name' : 'test',
+            'image' : 'test.jpg'
+        }]})
