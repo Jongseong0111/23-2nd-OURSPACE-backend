@@ -224,3 +224,47 @@ class DistrcitTest(TestCase):
             ]
         })
         self.assertEqual(response.status_code, 200)
+
+class CategoryTest(TestCase):
+    def setUp(self):
+        Category.objects.bulk_create(
+            [Category(
+                id    = i+1,
+                name  = f'Category{i+1}',
+                image = f'Image{i+1}'
+            ) for i in range(4)]
+        )
+
+    def tearDown(self):
+        Category.objects.all().delete()
+    
+    def test_category_success_view(self):
+        client       = Client()
+        response     = client.get('/spaces/category')
+
+        self.assertEqual(response.json(),
+        {
+            "RESULT": [
+                    {
+                        "id"       : 1,
+                        "name"     : "Category1",
+                        "image"    : "Image1"
+                    },
+                    {
+                        "id"       : 2,
+                        "name"     : "Category2",
+                        "image"    : "Image2"
+                    },
+                    {
+                        "id"       : 3,
+                        "name"     : "Category3",
+                        "image"    : "Image3"
+                    },
+                    {
+                        "id"       : 4,
+                        "name"     : "Category4",
+                        "image"    : "Image4"
+                    }
+            ]
+        })
+        self.assertEqual(response.status_code, 200)

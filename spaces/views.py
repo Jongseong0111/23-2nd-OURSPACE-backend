@@ -2,7 +2,7 @@ from django.http      import JsonResponse
 from django.views     import View
 from django.db.models import Min, Q, Count
 
-from spaces.models    import Space, District
+from spaces.models    import Space, District, Category
 from orders.models    import OrderStatus
 
 class ProductsView(View):
@@ -66,5 +66,15 @@ class DistrictView(View):
                     "lattitude" : district.lattitude,
                     "longitude" : district.longitude 
                 } for district in District.objects.all()]
+
+        return JsonResponse({'RESULT':result}, status=200)
+
+class CategoryView(View):
+    def get(self, request):
+        result = [{
+            "id"    : category.id, 
+            "name"  : category.name,
+            "image" : category.image
+        } for category in Category.objects.all()]
 
         return JsonResponse({'RESULT':result}, status=200)
