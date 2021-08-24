@@ -1,4 +1,5 @@
 import json
+from datetime import date
 
 from django.http      import JsonResponse
 from django.views     import View
@@ -16,7 +17,7 @@ class ReserveView(View):
             if Order.objects.filter(user_id = request.user.id, status_id = OrderStatus.Status.WAITING.value).exists():
                 Order.objects.filter(user_id = request.user.id, status_id = OrderStatus.Status.WAITING.value).delete()
 
-            Order.objects.create(
+            order = Order.objects.create(
                 space_id  = space_id,
                 user_id   = request.user.id, 
                 status_id = OrderStatus.Status.WAITING.value, 
@@ -25,17 +26,8 @@ class ReserveView(View):
                 option_id = data['option'],
                 booker    = None
                 )
-        
-            return JsonResponse({'MESSAGE': "SUCCESS"}, status=201)
-
-        except KeyError:
-            return JsonResponse({"MESSAGE": "KEY_ERROR"}, status=400)
-
-    @login_decorator
-    def get(self, request):
-        order = Order.objects.select_related('space').get(user_id = request.user.id, status_id = OrderStatus.Status.WAITING.value)
-
-        result = {
+            
+            result =  {
             "order_id"  : order.id,
             "space_id"  : order.space.id,
             "category"  : order.space.category.name,
@@ -50,5 +42,29 @@ class ReserveView(View):
             "option"    : order.option.option,
             "price"     : order.option.price
         }
+            return JsonResponse({'RESULT': result}, status=200)
+        except KeyError:
+            return JsonResponse({"MESSAGE": "KEY_ERROR"}, status=400)
 
-        return JsonResponse({'RESULT': result}, status=200)
+class OrderView(View):
+    @login_decorator
+    def get(self, request):
+        user      = request.user
+        complited = OrderStatus.Status.COMPLETED.value
+        orders    = Order.objects.filter(user=user, status_id=complited).order_by('-date')\
+        .select_related('space','option')
+
+        results = [{
+            'order_id'  : order.id,
+            'space_id'  : order.space.id,
+            'date'      : order.date,
+            'title'     : order.space.title,
+            'sub_title' : order.space.sub_title,
+            'address'   : order.space.address,
+            'image'     : order.space.image_set.first().image,
+            'option'    : order.option.option,
+            'price'     : order.option.price,
+            'is_expired': False if order.date > date.today() else True
+            } for order in orders ]
+
+        return JsonResponse({'results': results}, status=200)

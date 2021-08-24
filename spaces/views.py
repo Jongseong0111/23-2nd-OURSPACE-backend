@@ -12,7 +12,6 @@ from ourspace.settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STOR
 from storage           import S3Client
 
 class ProductsView(View):
-
     def get(self, request):
         district_id  = request.GET.get('district', None)
         category_id  = request.GET.get('category', None)
@@ -94,7 +93,7 @@ class HostView(View):
         min_count  = request.POST.get('min_count', 2)
         like       = request.POST.get('like', 0)
         images     = request.FILES.getlist('image')
-        facilities = request.POST.getlist('facility')
+        facilities = request.POST.get('facility', None).split(',')
         signs      = [{'key':str(uuid.uuid4()) + image.name, 'image' : image} for image in images]
 
         s3_client = S3Client(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)  
