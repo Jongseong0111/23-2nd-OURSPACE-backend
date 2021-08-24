@@ -7,6 +7,7 @@ from my_settings import SECRET_KEY
 class KaKaoSignInTest(TestCase):
     def setUp(self):
         User.objects.create(
+            id=1,
             kakao_id = '140327275127424',
             nickname = 'jang',
             email = 'luv4cece@naver.com'
