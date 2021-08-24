@@ -5,12 +5,11 @@ from django.views     import View
 from django.db.models import Min, Q, Count
 from django.db        import transaction
 
-from spaces.models    import Space, District, Category, Image, Option, Facility
-from orders.models    import Order, OrderStatus
-from users.models import User
-from users.utils import login_decorator
-from my_settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
-from ourspace.settings import AWS_STORAGE_BUCKET_NAME
+from spaces.models     import Space, District, Category, Image, Option, Facility, Review
+from orders.models     import Order, OrderStatus
+from users.utils       import login_decorator
+from ourspace.settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME
+from storage           import S3Client
 
 class ProductsView(View):
 
@@ -38,7 +37,7 @@ class ProductsView(View):
 
         if man_count:
             q &= Q(min_count__lte = man_count) & Q(max_count__gte = man_count)
-
+        
         if date:
             q_exclude = Q(order__status_id=OrderStatus.Status.COMPLETED.value) & Q(order__date=date)
             q_exclude &= ((Q(order__option__option="all") | Q(count_option = 2)))
@@ -98,11 +97,7 @@ class HostView(View):
         facilities = request.POST.getlist('facility')
         signs      = [{'key':str(uuid.uuid4()) + image.name, 'image' : image} for image in images]
 
-        s3_client = boto3.client(
-        's3',
-        aws_access_key_id = AWS_ACCESS_KEY_ID,
-        aws_secret_access_key = AWS_SECRET_ACCESS_KEY
-        )
+        s3_client = S3Client(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)  
 
         try:
             with transaction.atomic():
@@ -129,14 +124,7 @@ class HostView(View):
                 [space.facility.add(Facility.objects.get(id=facility))for facility in facilities]
                 
                 for sign in signs: 
-                    s3_client.upload_fileobj(
-                        sign['image'],
-                        AWS_STORAGE_BUCKET_NAME,
-                        'static/image/'+sign['key'],
-                        ExtraArgs = {
-                            'ContentType': sign['image'].content_type
-                        }
-                    )
+                    s3_client.upload(sign['image'], "image", AWS_STORAGE_BUCKET_NAME)
                 return JsonResponse({'message':'success'}, status=200)
         except KeyError:
             return JsonResponse({'message':'Key_Error'}, status=400)
@@ -144,8 +132,8 @@ class HostView(View):
 class FacilityView(View):
     def get(self, request):
         results = [{
-            'id' : facility.id,
-            'name' : facility.name,
+            'id'    : facility.id,
+            'name'  : facility.name,
             'image' : facility.image
         }for facility in Facility.objects.all()]
         
@@ -185,15 +173,17 @@ class DateFilterView(View):
         date   = request.GET.get('date')
         option = request.GET.get('option')
 
+        key = Option.objects.get(id=option).option
+
         if not Order.objects.filter(space_id=space_id, date=date, status_id=OrderStatus.Status.COMPLETED.value).exists():
             return JsonResponse({'message':'OK'}, status=200)
 
-        if option == 'all' :
+        if key == 'all' :
             return JsonResponse({'message':'DENIED'}, status=400)
 
         orders = Order.objects.filter(space_id=space_id, date=date, status_id=OrderStatus.Status.COMPLETED.value)
 
-        if orders.filter(Q(option__option='all') | Q(option__option=option)).exists():
+        if orders.filter(Q(option__option='all') | Q(option__option=key)).exists():
             return JsonResponse({'message':'DENIED'}, status=400)
 
         return JsonResponse({'message':'OK'}, status=200)
@@ -207,3 +197,28 @@ class FacilityView(View):
         }for facility in Facility.objects.all()]
 
         return JsonResponse({'results':results}, status=200)
+
+class ReviewView(View):
+    @login_decorator
+    def post(self, request, space_id):
+        data       = request.POST
+        image      = request.FILES.get('image', None)
+        key        = str(uuid.uuid4()) + image.name
+
+        s3_client = S3Client(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+
+        try:
+            with transaction.atomic():
+                Review.objects.create(
+                    user     = request.user,
+                    space_id = space_id,
+                    image    = 'https://ourspace-js.s3.ap-northeast-2.amazonaws.com/static/review/' + key,
+                    grade    = data['grade'],
+                    content  = data['content']
+                )
+                
+                s3_client.upload(image, "review", AWS_STORAGE_BUCKET_NAME)
+                
+                return JsonResponse({'MESSAGE':'SUCCESS'}, status=200)
+        except KeyError:
+            return JsonResponse({'MESSAGE':'KEY_ERROR'}, status=400)
