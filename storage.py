@@ -1,4 +1,4 @@
-import boto3, uuid
+import boto3
 
 class S3Client():
     def __init__(self, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY):
@@ -7,13 +7,20 @@ class S3Client():
         aws_access_key_id = AWS_ACCESS_KEY_ID,
         aws_secret_access_key = AWS_SECRET_ACCESS_KEY
         )
+        self.base = 'static/'
+    
+    def __del__(self):
+        return None
 
-    def upload(self, image_file, directory, AWS_STORAGE_BUCKET_NAME):
+    def upload(self, file, file_name, bucket_name):
         self.s3.upload_fileobj(
-            image_file,
-            AWS_STORAGE_BUCKET_NAME,
-            'static/' +directory+"/"+str(uuid.uuid4()) + image_file.name,
+            file,
+            bucket_name,
+            self.base + file_name,
             ExtraArgs = {
-                'ContentType' : image_file.content_type
+                'ContentType' : file.content_type
             }
         )
+    
+    def delete(self, file_name, bucket_name):
+        self.s3.delete_object(Bucket=bucket_name, Key = self.base + file_name)
