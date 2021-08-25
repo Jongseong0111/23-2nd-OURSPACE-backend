@@ -8,7 +8,7 @@ from django.db        import transaction
 from spaces.models     import Space, District, Category, Image, Option, Facility, Review
 from orders.models     import Order, OrderStatus
 from users.utils       import login_decorator
-from ourspace.settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME
+from ourspace.settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME, AWS_S3_DIRS
 from storage           import S3Client
 
 class ProductsView(View):
@@ -94,7 +94,7 @@ class HostView(View):
         like       = request.POST.get('like', 0)
         images     = request.FILES.getlist('image')
         facilities = request.POST.get('facility', None).split(',')
-        signs      = [{'key':str(uuid.uuid4()) + image.name, 'image' : image} for image in images]
+        signs      = [{'key':'image/' + str(uuid.uuid4()) + image.name, 'image' : image} for image in images]
 
         s3_client = S3Client(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)  
 
@@ -112,7 +112,7 @@ class HostView(View):
                     like        = like
                 )
                 Image.objects.bulk_create([
-                    Image(space=space, image='https://ourspace-js.s3.ap-northeast-2.amazonaws.com/static/image/' + sign['key'])
+                    Image(space=space, image = AWS_S3_DIRS + sign['key'])
                     for sign in signs
                 ])
                 Option.objects.bulk_create([
@@ -123,7 +123,8 @@ class HostView(View):
                 [space.facility.add(Facility.objects.get(id=facility))for facility in facilities]
                 
                 for sign in signs: 
-                    s3_client.upload(sign['image'], "image", AWS_STORAGE_BUCKET_NAME)
+                    s3_client.upload(sign['image'], sign['key'], AWS_STORAGE_BUCKET_NAME)
+
                 return JsonResponse({'message':'success'}, status=200)
         except KeyError:
             return JsonResponse({'message':'Key_Error'}, status=400)
@@ -144,7 +145,7 @@ class ProductDetailView(View):
         if not Space.objects.filter(id=space_id).exists():
             return JsonResponse({'message':'No_Space'}, status=404)
 
-        space = Space.objects.get(id=space_id)
+        space = Space.objects.select_related("category", "district").get(id=space_id)
 
         results = [{
             'id'         : space.id,
@@ -202,21 +203,19 @@ class ReviewView(View):
     def post(self, request, space_id):
         data       = request.POST
         image      = request.FILES.get('image', None)
-        key        = str(uuid.uuid4()) + image.name
-
-        s3_client = S3Client(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+        key        = 'review/' + str(uuid.uuid4()) + image.name
+        s3_client  = S3Client(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
 
         try:
             with transaction.atomic():
                 Review.objects.create(
                     user     = request.user,
                     space_id = space_id,
-                    image    = 'https://ourspace-js.s3.ap-northeast-2.amazonaws.com/static/review/' + key,
+                    image    = AWS_S3_DIRS + key,
                     grade    = data['grade'],
                     content  = data['content']
                 )
-                
-                s3_client.upload(image, "review", AWS_STORAGE_BUCKET_NAME)
+                s3_client.upload(image, key, AWS_STORAGE_BUCKET_NAME)
                 
                 return JsonResponse({'MESSAGE':'SUCCESS'}, status=200)
         except KeyError:

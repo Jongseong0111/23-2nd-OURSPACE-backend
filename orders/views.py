@@ -26,7 +26,10 @@ class ReserveView(View):
                 option_id = data['option'],
                 booker    = None
                 )
-            
+
+            order = Order.objects.select_related('space', 'space__category', 'option')\
+                                 .prefetch_related('space__facility')\
+                                 .get(user_id = request.user.id, status_id = OrderStatus.Status.WAITING.value)
             result =  {
             "order_id"  : order.id,
             "space_id"  : order.space.id,
@@ -50,8 +53,8 @@ class OrderView(View):
     @login_decorator
     def get(self, request):
         user      = request.user
-        complited = OrderStatus.Status.COMPLETED.value
-        orders    = Order.objects.filter(user=user, status_id=complited).order_by('-date')\
+        completed = OrderStatus.Status.COMPLETED.value
+        orders    = Order.objects.filter(user=user, status_id=completed).order_by('-date')\
         .select_related('space','option')
 
         results = [{

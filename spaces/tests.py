@@ -634,28 +634,28 @@ class DateFilterViewTest(TestCase):
     def test_date_filter_view_ok(self):
         client = Client()
 
-        response = client.get('/spaces/detail/1/status?date=2021-08-22&option=night')
+        response = client.get('/spaces/detail/1/status?date=2021-08-22&option=2')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'message':'OK'})
 
     def test_date_filter_view_ok_2(self):
         client = Client()
 
-        response = client.get('/spaces/detail/1/status?date=2021-08-23&option=night')
+        response = client.get('/spaces/detail/1/status?date=2021-08-23&option=2')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'message':'OK'})
 
     def test_date_filter_view_denied(self):
         client = Client()
 
-        response = client.get('/spaces/detail/1/status?date=2021-08-22&option=day')
+        response = client.get('/spaces/detail/1/status?date=2021-08-22&option=1')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'message':'DENIED'})
 
     def test_date_filter_view_denied_2(self):
         client = Client()
 
-        response = client.get('/spaces/detail/1/status?date=2021-08-22&option=all')
+        response = client.get('/spaces/detail/1/status?date=2021-08-22&option=3')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'message':'DENIED'})
 

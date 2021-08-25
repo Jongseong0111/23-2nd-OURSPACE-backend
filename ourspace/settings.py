@@ -122,6 +122,8 @@ AWS_S3_OBJECT_PARAMETERS = {
 
 AWS_LOCATION = 'static'
 
+AWS_S3_DIRS = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
