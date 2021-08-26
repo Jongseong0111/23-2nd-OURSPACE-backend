@@ -1,4 +1,4 @@
-import json, jwt, requests, random
+import jwt, requests, random
 
 from django.http  import JsonResponse
 from django.views import View
