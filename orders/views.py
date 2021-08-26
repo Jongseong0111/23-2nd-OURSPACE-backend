@@ -14,8 +14,8 @@ class ReserveView(View):
             space_id = request.GET.get("space_id", None)
             data     = json.loads(request.body)
                  
-            if Order.objects.filter(user_id = request.user.id, status_id = OrderStatus.Status.WAITING.value).exists():
-                Order.objects.filter(user_id = request.user.id, status_id = OrderStatus.Status.WAITING.value).delete()
+            if Order.objects.filter(user_id = request.user.id, status_id = OrderStatus.Status.COMPLETED.value).exists():
+                Order.objects.filter(user_id = request.user.id, status_id = OrderStatus.Status.COMPLETED.value).delete()
 
             order = Order.objects.create(
                 space_id  = space_id,
@@ -29,7 +29,7 @@ class ReserveView(View):
 
             order = Order.objects.select_related('space', 'space__category', 'option')\
                                  .prefetch_related('space__facility')\
-                                 .get(user_id = request.user.id, status_id = OrderStatus.Status.WAITING.value)
+                                 .get(user_id = request.user.id, status_id = OrderStatus.Status.COMPLETED.value)
             result =  {
             "order_id"  : order.id,
             "space_id"  : order.space.id,
