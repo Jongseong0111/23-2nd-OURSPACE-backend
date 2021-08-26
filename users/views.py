@@ -18,7 +18,7 @@ class KakaoSignInView(View):
             response      = requests.get(url, headers={'Authorization': f'Bearer {access_token}'})
             user_response = response.json()
         
-            user,created = User.objects.get_or_create(kakao_id=user_response['id'])
+            user,created = User.objects.get_or_create(kakao_id=user_response['id'],nickname = user_response['properties']['nickname'])
 
             if created: 
                 user.email    = user_response['kakao_account']['email']
@@ -27,6 +27,7 @@ class KakaoSignInView(View):
                 user.save()
 
             token = jwt.encode({'id':user.id}, SECRET_KEY, algorithm= 'HS256')
+            
             return JsonResponse({'access_token':token}, status=200)
         except KeyError:
             return JsonResponse({'message':'invalid_token'}, status=400)
