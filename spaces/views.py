@@ -95,7 +95,7 @@ class HostView(View):
         images     = request.FILES.getlist('image')
         facilities = request.POST.get('facility', None).split(',')
         signs      = [{'key':'image/' + str(uuid.uuid4()) + image.name, 'image' : image} for image in images]
-
+        
         s3_client = S3Client(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)  
 
         try:
