@@ -52,5 +52,5 @@
 ## AWS(Ec2, RDS)와 Docker를 이용한 프로젝트 배포
 
 
-# 프로젝트 깃헙
+# 협업한 프로젝트 깃헙
 - https://github.com/wecode-bootcamp-korea/23-2nd-OURSPACE-frontend
