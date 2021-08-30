@@ -13,6 +13,7 @@
 - 개발기간: 21/08/17 ~ 21/08/27
 
 postman API 정의서 : https://documenter.getpostman.com/view/16843754/TzzGJZQ8 
+
 사이트 구현 녹화 영상 Youtube : https://www.youtube.com/watch?v=8b4LgFIEaCk&ab_channel=TaekjunSim
 
 # 적용 기술
