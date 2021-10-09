@@ -61,26 +61,37 @@
 - Eager Loading 개념을 이해하고 Query Debugger를 활용해 API Query의 수를 100개에서 3개로 감소
 - AWS EC2 Instance에서 Docker Container를 띄워 서버 배포
 
-postman API 정의서 : https://documenter.getpostman.com/view/16843754/TzzGJZQ8 
 ## 커뮤니케이션
 
 ### Stand Up Meeting
 
-매일 11시 Stand Up Meeting을 통해 In progress - Done과 Front-Back간 소통을 진행하고 매주 Sprint Meeting을 실행했습니다.
-
+- 매일 11시 Stand Up Meeting을 통해 In progress - Done과 Front-Back간 소통을 진행하고 매주 Sprint Meeting을 실행했습니다.
+- Stand Up Meeting 전 Frontend, Backend 각각 미팅으 진행하여 정리한 후 Front-Back Meeting을 진행해 원활한 소통이 가능하도록 했습니다.
+- 매일 6시 50분 Wrap Up Meeting을 통해 하루를 정리했습니다.
+- 
 ### Trello
 
-![image](https://user-images.githubusercontent.com/84963683/136553563-1a702ad0-24ed-48f4-bc76-3dbe213a7055.png)
+![image](https://user-images.githubusercontent.com/84963683/136654371-47765fc7-09a3-4ca5-9403-368cdb8df626.png)
 
-Front/Back으로 라벨을 분류하고 담당자를 표기하여 직관적으로 확인할 수 있도록 했습니다.
+- Front/Back으로 라벨을 분류하고 담당자를 표기하여 직관적으로 확인할 수 있도록 했습니다.
+- 프로젝트 과정에서 발생하는 Issue와 Blocker를 기록하였습니다.
+- Front-Backend 간 소통이 원활할 수 있도록 API 정의서와 ERD를 공유하고 수시로 업데이트했습니다.
+- 미팅시간을 명시하고 Meeting Log를 작성하여 공유했습니다.
 
-### [Google Spreadsheet(API Documentation)](https://docs.google.com/spreadsheets/d/1PQloL3tWtjEiXV1-C4fMiV3jH8Ei1RrNkqakNAejlLo/edit?usp=sharing)
+### [Google Spreadsheet(API Documentation)](https://docs.google.com/spreadsheets/d/1vL21nq75g_9duQGF6-2D2S7D91lnT9BbnlBwiJTuubY/edit?usp=sharing)
 
-![image](https://user-images.githubusercontent.com/84963683/136554959-d7457e76-e529-48e6-aaef-8dbafd8f420d.png)
+![image](https://user-images.githubusercontent.com/84963683/136654510-2f3b802a-fde5-4c4e-9331-2f0739f3a87a.png)
 
-API별 기능, URL, Request 및 Response Key Value와 특이사항을 정리하여 프론트엔드와 공유하였습니다.
+- API별 Method, URL, Request 및 Response Key Value와 특이사항을 정리하여 프론트엔드와 공유하였습니다.
+- API별 기능을 정리하고 특이사항과 Front-Back 소통이 필요한 사항을 정리하여 소통이 원활하도록 했습니다.
+
+### [POSTMAN API Documentation](https://documenter.getpostman.com/view/16843754/TzzGJZQ8)
+
+![image](https://user-images.githubusercontent.com/84963683/136654578-6529565e-aec5-4c49-bfe0-1cd9d6eb651a.png)
+
+POSTMAN으로 API를 문서화하여 API 별 기능, Request와 Response Value를 직관적으로 알기 쉽도록 했습니다.
 
 ## Reference
 
-- 이 프로젝트는 모트모트 사이트를 참조하여 학습목적으로 만들었습니다.
+- 이 프로젝트는 스페이스클라우드 사이트를 참조하여 학습목적으로 만들었습니다.
 - 실무수준의 프로젝트이지만 학습용으로 만들었기 때문에 이 코드를 활용하여 이득을 취하거나 무단 배포할 경우 법적으로 문제될 수 있습니다.
