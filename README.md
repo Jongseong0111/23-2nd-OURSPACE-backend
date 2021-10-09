@@ -24,6 +24,29 @@
 
 [시연영상](https://www.youtube.com/watch?v=8b4LgFIEaCk&ab_channel=TaekjunSim)
 
+### 메인/공간목록
+
+![아워스페이스_녹화본](https://user-images.githubusercontent.com/84963683/136654713-4d85ac2c-019a-4c26-aa46-ba5a2fe3fc43.gif)
+![아워스페이스_녹화본 (1)](https://user-images.githubusercontent.com/84963683/136654768-29398d80-2502-4c9c-bff4-1e36e4f9776f.gif)
+
+### 카카오 소셜 로그인
+
+![아워스페이스_녹화본 (2)](https://user-images.githubusercontent.com/84963683/136654810-232792c4-4ab1-4479-b20e-4baba445abf5.gif)
+
+### 공간 등록 
+
+![아워스페이스_녹화본 (3)](https://user-images.githubusercontent.com/84963683/136654858-dcc7c58f-7455-4145-8633-eaf27da8c526.gif)
+![아워스페이스_녹화본 (4)](https://user-images.githubusercontent.com/84963683/136654861-49f0d23a-dbed-4845-b6e9-9f305677c1cc.gif)
+
+### 공간 예약/결제
+
+![아워스페이스_녹화본 (5)](https://user-images.githubusercontent.com/84963683/136654946-c8911a24-fbbe-422e-82f2-3f659b1e71bd.gif)
+![아워스페이스_녹화본 (6)](https://user-images.githubusercontent.com/84963683/136654953-d4e67297-a9fa-4f8f-9a65-24b53252a383.gif)
+![아워스페이스_녹화본 (7)](https://user-images.githubusercontent.com/84963683/136654956-015f6b32-7792-47d4-b752-450d368125bc.gif)
+
+### 예약내역 조회
+
+![아워스페이스_녹화본 (8)](https://user-images.githubusercontent.com/84963683/136655023-aa7c72ab-4bbd-4dbf-a8ac-88cb196a6024.gif)
 
 ## 사용 기술
 
@@ -68,7 +91,7 @@
 - 매일 11시 Stand Up Meeting을 통해 In progress - Done과 Front-Back간 소통을 진행하고 매주 Sprint Meeting을 실행했습니다.
 - Stand Up Meeting 전 Frontend, Backend 각각 미팅으 진행하여 정리한 후 Front-Back Meeting을 진행해 원활한 소통이 가능하도록 했습니다.
 - 매일 6시 50분 Wrap Up Meeting을 통해 하루를 정리했습니다.
-- 
+
 ### Trello
 
 ![image](https://user-images.githubusercontent.com/84963683/136654371-47765fc7-09a3-4ca5-9403-368cdb8df626.png)
